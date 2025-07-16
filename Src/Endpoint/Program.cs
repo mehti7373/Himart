@@ -1,10 +1,24 @@
-using System.Reflection;
+﻿using System.Reflection;
+using System.Text.Json.Serialization;
 using Core.Application.Tasks.Commands.CreateTask;
+using Core.Domain.TaskAggregate.DomainService;
+using Endpoint.Extensions;
+using Infrastructure.Data;
 using MassTransit;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Host.UseSerilog((context, services, configuration) =>
+{
+    configuration
+        .ReadFrom.Configuration(context.Configuration)
+        .ReadFrom.Services(services)
+        .Enrich.FromLogContext();
+});
+
+
 builder.Services.AddMassTransit(x =>
 {
     x.AddConsumers(typeof(Program)); // Register all consumers in the assembly
@@ -21,11 +35,22 @@ builder.Services.AddMassTransit(x =>
     });
 });
 
+builder.Services.AddEntityFramework(builder.Configuration);
 builder.Services.AddMediatR(c => c.RegisterServicesFromAssembly(typeof(CreateTaskCommand).Assembly));
-builder.Services.AddControllers();
+builder.Services.AddScoped<ITaskDomainService, TaskDomainService>();
+
+
+builder.Services.AddControllers().AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
+    //options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+    options.JsonSerializerOptions.WriteIndented = false;
+});
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddHimartSwagger();
 
 var app = builder.Build();
 
@@ -33,13 +58,16 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseHimartSwagger(app);
 }
+
+app.Services.MigrateDbContext();
+
 
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
-
+app.UseSerilogRequestLogging(); // ✅ Optional: logs all HTTP requests
 app.MapControllers();
 
 app.Run();

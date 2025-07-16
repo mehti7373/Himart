@@ -8,7 +8,7 @@ using Infrastructure.Data.TaskAggregate;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Data.Context;
-public class DatabaseContext:DbContext
+public class DatabaseContext(DbContextOptions<DatabaseContext> options) : DbContext(options)
 {
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

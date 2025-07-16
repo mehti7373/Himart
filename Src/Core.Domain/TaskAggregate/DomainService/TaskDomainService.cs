@@ -2,11 +2,11 @@
 using Core.Domain.TaskAggregate.ValueObjects;
 
 namespace Core.Domain.TaskAggregate.DomainService;
-internal interface ITaskDomainService
+public interface ITaskDomainService
 {
     bool IsValidCheckoutDate(CreateAt createAt, CheckOutDate? checkOutDate);
 }
-internal class TaskDomainService : ITaskDomainService
+public class TaskDomainService : ITaskDomainService
 {
     bool ITaskDomainService.IsValidCheckoutDate(CreateAt createAt, CheckOutDate? checkOutDate)=>
           checkOutDate is null ||
