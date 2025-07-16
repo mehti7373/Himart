@@ -1,12 +1,6 @@
 ﻿using MediatR;
 
 namespace Core.Application.Tasks.Commands.CreateTask;
-public record CreateTaskCommand(string title, TaskStatus Status, DateOnly checkoutDate) : IRequest<CreateTaskCommandResponse>;
-public record CreateTaskCommandResponse();
-public class CreateTaskCommandHandler : IRequestHandler<CreateTaskCommand, CreateTaskCommandResponse>
-{
-    public Task<CreateTaskCommandResponse> Handle(CreateTaskCommand request, CancellationToken cancellationToken)
-    {
-        throw new NotImplementedException();
-    }
-}
+public record CreateTaskCommand(string title, Enums.TaskEntityStatus Status, DateOnly? checkoutDate, Guid creatorUserId)
+    : IRequest<CreateTaskCommandResponse>;
+public record CreateTaskCommandResponse(Guid id);

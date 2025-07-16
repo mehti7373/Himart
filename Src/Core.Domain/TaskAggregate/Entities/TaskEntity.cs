@@ -1,4 +1,5 @@
 ﻿using Core.Domain.Shared.ValueObjects;
+using Core.Domain.TaskAggregate.Events;
 using Core.Domain.TaskAggregate.ValueObjects;
 using Framework.Domain.Models;
 
@@ -22,5 +23,19 @@ public class TaskEntity : AggregateRoot<TaskEntity, Guid>
         CheckOutDate = checkOutDate;
         CreatorUserId = creatorUserId;
         CreateAt = CreateAt.Now;
+        AddDomainEvent(new TaskEntityCreatedEvent(Title,
+                                                  Status,
+                                                  CheckOutDate,
+                                                  CreateAt,
+                                                  CreatorUserId));
+    }
+
+    public void Set(Title title,Status status, CheckOutDate? checkOutDate)
+    {
+        Title = title;
+        Status = status;
+        CheckOutDate = checkOutDate;
+
+        AddDomainEvent(new TaskEntityUpdatedEvent(Id,Title, Status, CheckOutDate));
     }
 }

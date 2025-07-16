@@ -10,8 +10,4 @@
     <ProjectReference Include="..\Framework.Domain\Framework.Domain.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="TaskAggregate\Events\" />
-  </ItemGroup>
-
 </Project>
